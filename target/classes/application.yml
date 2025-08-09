@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: moneymanager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/moneymanager
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_USERNAME}
+    password: ${BREVO_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          from: ${BREVO_FROM_EMAIL}
+        protocol: smtp
+  profiles:
+    active: prod
+
+
+
+
+logging:
+  level:
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+
+
+server:
+  servlet:
+    context-path: /api/v1.0
+
+
+app:
+  jwt:
+    secret: mySecretKey1234567890123456789012345678901234567890
+    expiration: 86400000
+  activation:
+    url: ${MONEY_MANAGER_BACKEND_URL}
+
+money:
+  manager:
+    frontend:
+      url: ${MONEY_MANAGER_FRONTEND_URL}
+
+
