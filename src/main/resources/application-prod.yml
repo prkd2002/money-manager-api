@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://dpg-d2bg2endiees73ene450-a.frankfurt-postgres.render.com/moneymanager_t2we
+    username: moneymanager_t2we_user
+    password: rwmUmckUvvrp1e6RYn6U7e3bsa9HJbCL
+    driver-class-name: org.postgresql.Driver
