@@ -13,12 +13,19 @@ import com.rustytech.moneymanager.exceptions.UnauthorizeException;
 import com.rustytech.moneymanager.repository.CategoryRepository;
 import com.rustytech.moneymanager.repository.ExpenseRepository;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,5 +119,39 @@ public class ExpenseService {
                 .amount(expenseEntity.getAmount())
                 .date(expenseEntity.getDate()).createdAt(expenseEntity.getCreatedAt()).updatedAt(expenseEntity.getUpdatedAt()).
                 build();
+    }
+
+    public ByteArrayInputStream expensesToExcel(List<ExpenseDto> incomes){
+        String[] HEADERS = {"S.No","Name","Category","Amount","Date"};
+        try(Workbook wb = new XSSFWorkbook();
+            ByteArrayOutputStream out = new ByteArrayOutputStream()){
+            Sheet sheet = wb.createSheet("Expenses");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            for(int i= 0; i < HEADERS.length; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(HEADERS[i]);
+            }
+
+            // Data rows
+            int rowIdx = 1;
+            int serial = 1;
+            for(ExpenseDto expenseDto : incomes){
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(serial++);
+                row.createCell(1).setCellValue(expenseDto.getName());
+                row.createCell(2).setCellValue(expenseDto.getCategoryName());
+                row.createCell(3).setCellValue(expenseDto.getAmount().toString());
+                row.createCell(4).setCellValue(expenseDto.getDate().toString());
+            }
+            wb.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+
+
+        }catch (Exception e){
+            throw new RuntimeException("Failed to export data to Excel file: "+ e.getMessage());
+
+        }
     }
 }

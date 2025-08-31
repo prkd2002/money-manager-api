@@ -37,7 +37,7 @@ public class CategoryService {
 
     public List<CategoryDto> getCategoriesByTypeForCurrentUser(String type) {
         Profile profile = profileService.getCurrentProfile();
-        List<CategoryEntity> categories = categoryRepository.findByTypeAndProfileId(type, profile.getId());
+        List<CategoryEntity> categories = categoryRepository.findByTypeAndProfileId(type.substring(0,1).toUpperCase() + type.substring(1), profile.getId());
         return categories.stream().map(this::toDto).collect(Collectors.toList());
     }
 

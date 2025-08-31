@@ -12,9 +12,16 @@ import com.rustytech.moneymanager.exceptions.UnauthorizeException;
 import com.rustytech.moneymanager.repository.CategoryRepository;
 import com.rustytech.moneymanager.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -101,5 +108,40 @@ public class IncomeService {
                 .amount(incomeEntity.getAmount())
                 .date(incomeEntity.getDate()).createdAt(incomeEntity.getCreatedAt()).updatedAt(incomeEntity.getUpdatedAt()).
                 build();
+    }
+
+
+    public ByteArrayInputStream incomesToExcel(List<IncomeDto> incomes){
+        String[] HEADERS = {"S.No","Name","Category","Amount","Date"};
+        try(Workbook wb = new XSSFWorkbook();
+            ByteArrayOutputStream out = new ByteArrayOutputStream()){
+            Sheet sheet = wb.createSheet("Incomes");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            for(int i= 0; i < HEADERS.length; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(HEADERS[i]);
+            }
+
+            // Data rows
+            int rowIdx = 1;
+            int serial = 1;
+            for(IncomeDto incomeEntity : incomes){
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(serial++);
+                row.createCell(1).setCellValue(incomeEntity.getName());
+                row.createCell(2).setCellValue(incomeEntity.getCategoryName());
+                row.createCell(3).setCellValue(incomeEntity.getAmount().toString());
+                row.createCell(4).setCellValue(incomeEntity.getDate().toString());
+            }
+            wb.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+
+
+        }catch (Exception e){
+            throw new RuntimeException("Failed to export data to Excel file: "+ e.getMessage());
+
+        }
     }
 }
