@@ -30,8 +30,8 @@ spring:
           from: ${BREVO_FROM_EMAIL}
         protocol: smtp
 
-  profiles:
-    active: prod
+  #profiles:
+  # active: prod
 
 logging:
   level:
